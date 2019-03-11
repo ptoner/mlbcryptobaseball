@@ -1,0 +1,51 @@
+import { PlayerService} from "./player-service"
+
+
+/** Web3 */
+var Web3 = require("web3")
+var fs = require('fs')
+
+const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/fbc80c62bd7d4e61b0c4b5654d226d87'))
+
+var parsedAbi = JSON.parse(fs.readFileSync("contract.json"))
+var mlbContractAddress = '0x8c9b261Faef3b3C2e64ab5E58e04615F8c788099'
+var contractInstance = new web3.eth.Contract(parsedAbi,mlbContractAddress)
+
+var mysqlConnection = createMySqlConnection()
+
+
+
+
+let playerService: PlayerService = new PlayerService(contractInstance, mysqlConnection)
+
+
+playerService.downloadAll()
+
+
+
+
+
+
+
+
+function createMySqlConnection() {
+    /** mysql */
+    var mysql      = require('mysql');
+    var mysqlConnection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'admin',
+    password : 'password',
+    })
+
+    mysqlConnection.connect(function(err) {
+    // connected! (unless `err` is set)
+    })
+
+    mysqlConnection.query('USE mlbcryptobaseball', function(err) {
+        if (err) throw err;
+    
+        console.log('Query Successful');
+    })
+
+    return mysqlConnection
+}
