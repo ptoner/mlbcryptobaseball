@@ -1,4 +1,6 @@
 import { PlayerService} from "./player-service"
+import { FileService } from "./file_service";
+const util = require('util');
 
 
 /** Web3 */
@@ -12,11 +14,19 @@ var mlbContractAddress = '0x8c9b261Faef3b3C2e64ab5E58e04615F8c788099'
 var contractInstance = new web3.eth.Contract(parsedAbi,mlbContractAddress)
 
 var mysqlConnection = createMySqlConnection()
+var mysqlQuery = util.promisify(mysqlConnection.query).bind(mysqlConnection)
+
+const ipfsClient = require('ipfs-http-client')
+
+const ipfs = ipfsClient({
+    host: "localhost",
+    port: 5001,
+    protocol: 'http'
+  })
 
 
-
-
-let playerService: PlayerService = new PlayerService(contractInstance, mysqlConnection)
+let fileService: FileService = new FileService(ipfs)
+let playerService: PlayerService = new PlayerService(contractInstance, mysqlQuery, fileService)
 
 
 playerService.downloadAll()
