@@ -1,5 +1,6 @@
 import { PlayerService} from "./player-service"
 import { FileService } from "./file_service";
+import { CardService } from "./card-service";
 const util = require('util');
 
 
@@ -25,8 +26,9 @@ const ipfs = ipfsClient({
   })
 
 
-let fileService: FileService = new FileService(ipfs)
-let playerService: PlayerService = new PlayerService(contractInstance, mysqlQuery,ipfs, fileService)
+  let fileService: FileService = new FileService(ipfs)
+  let cardService: CardService = new CardService(mysqlQuery)
+  let playerService: PlayerService = new PlayerService(contractInstance,ipfs, fileService, cardService)
 
 
 async function run() {
