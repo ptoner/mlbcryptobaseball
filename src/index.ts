@@ -26,12 +26,15 @@ const ipfs = ipfsClient({
 
 
 let fileService: FileService = new FileService(ipfs)
-let playerService: PlayerService = new PlayerService(contractInstance, mysqlQuery, fileService)
+let playerService: PlayerService = new PlayerService(contractInstance, mysqlQuery,ipfs, fileService)
 
 
-playerService.downloadAll()
+async function run() {
+    await playerService.downloadAll(125000, 165000)
+}
 
 
+run()
 
 
 

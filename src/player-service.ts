@@ -56,73 +56,74 @@ class PlayerService {
     constructor(
         private contractInstance: any,
         private query: any,
+        private ipfs: any,
         private fileService: FileService
     ) {}
 
-    async downloadAll(): Promise<void> {
+    async downloadAll(start: number, finish: number): Promise<void> {
 
         const self = this
 
-        let keepGoing: boolean = true
-        let counter: number = 0
+        let counter: number = start
     
-        while(keepGoing) {
+        while(counter <= finish) {
     
             try {
                 let tokenId = await this.contractInstance.methods.tokenByIndex(counter).call()
                 
-                setTimeout(
-                    async function () {
-                        console.log(`Downloading card with tokenId: ${tokenId}`)
-                        
-                        let card: Card = await self.getCardByTokenId(tokenId)
-
-                        await self.saveCardToIpfs(card)
-                        
-                    }, 
-                    100
-                )
+                await self.downloadToken(tokenId)
     
                 counter++
                 
             } catch(ex) {
                 console.log(ex)
-                keepGoing = false
-            }
-    
+            }    
         }
     }
     
 
+    async downloadToken(tokenId: number) : Promise<void> {
+
+        console.log(`Downloading card with tokenId: ${tokenId}`)
+                
+        let card: Card = await this.getCardByTokenId(tokenId)
+
+        return this.saveCardToIpfs(card)
+
+    }
+
+
     async processAll(): Promise<void> {
 
-        let keepGoing: boolean = true
-        let tokenId: number = 0
-    
-        while(keepGoing) {
-    
-            try {
 
-                let card: Card = await this.getCardFromIpfs(tokenId)
+        let files = await this.ipfs.files.ls('/mlbc')
+        for (let file of files) {
 
-                await this.saveCard(card)
-                
-                tokenId++
-                
-            } catch(ex) {
-                console.log(ex)
-                keepGoing = false
-            }
-    
+            console.log(file)
+
+            // let filename = `${folderName}/${file.name}`
+            // try {
+            //     let result = await this.loadFile(filename)
+            //     results.push(result)
+            // } catch (ex) {
+            //     // console.log(`Error reading file: ${filename}`)
+            //     // console.log(ex)
+            // }
         }
+        
 
 
+    }
+
+    async processToken(tokenId: number ) : Promise<void> {
+
+        let card: Card = await this.getCardFromIpfs(tokenId)
+
+        await this.saveCard(card)
     }
 
 
     async saveCardToIpfs(card: Card) : Promise<void> {
-
-        console.log(card.tokenID)
 
         let path: string = `/mlbc/${card.tokenID}.json`
 
@@ -167,7 +168,11 @@ class PlayerService {
 
 
         const result = await this.query(
-            'INSERT INTO card (visualString, uniformNumber, positionName, gameCardTeamID, teamName, positionId, attachments, playerOverrideId, stance, isPromotional, isAttached, isPlaying, tokenId, generationSeason, creationTimestamp, attachmentString, abilityString, earnedBy, gloveType, sequenceId, earnedByString, mlbPlayerId, teamId, allAttributes, mlbGameId, type, batType, imagesUrl ) ' +
+            'INSERT INTO card (' +
+                'visualString, uniformNumber, positionName, gameCardTeamID, teamName, positionId, attachments, ' + 
+                'playerOverrideId, stance, isPromotional, isAttached, isPlaying, tokenId, generationSeason, creationTimestamp, ' + 
+                'attachmentString, abilityString, earnedBy, gloveType, sequenceId, earnedByString, mlbPlayerId, teamId, ' + 
+                'allAttributes, mlbGameId, type, batType, imagesUrl, status, position, lastName, firstName, playerId, debutDate, fullName, mlbTeamId, number ) ' +
             'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
             [
                 card.visualString, 
@@ -196,7 +201,16 @@ class PlayerService {
                 card.allAttributes, 
                 card.mlbGameId, card.type, 
                 card.batType, 
-                JSON.stringify(card.imagesURL) 
+                JSON.stringify(card.imagesURL),
+                card.mlbPlayerInfo.status,
+                card.mlbPlayerInfo.position,
+                card.mlbPlayerInfo.lastName,
+                card.mlbPlayerInfo.firstName,
+                card.mlbPlayerInfo.playerId,
+                card.mlbPlayerInfo.debutDate,
+                card.mlbPlayerInfo.fullName,
+                card.mlbPlayerInfo.mlbTeamId,
+                card.mlbPlayerInfo.number 
             ]
         )
 
