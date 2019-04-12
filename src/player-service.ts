@@ -44,6 +44,9 @@ class PlayerService {
                 
         let card: Card = await this.fetchCardByTokenId(tokenId)
 
+        card = await this.translateImages(card)
+
+
         return this.saveCardToIpfs(card)
 
     }
@@ -78,6 +81,63 @@ class PlayerService {
         await this.cardService.saveCard(card)
     }
 
+
+    async translateImages(card: Card) : Promise<Card> {
+
+        if (!card.imagesUrl) return 
+
+        card.imagesUrl.threeSixtyImages = await this.translateImagesToIpfs(card.imagesUrl.threeSixtyImages)
+        card.imagesUrl.featureImages = await this.translateImagesToIpfs(card.imagesUrl.featureImages)
+        card.imagesUrl.bannerImage = await this.translateImageToIpfs(card.imagesUrl.bannerImage)
+        card.imagesUrl.thumbnailImage = await this.translateImageToIpfs(card.imagesUrl.thumbnailImage)
+
+        return card
+    }
+
+    async translateImagesToIpfs(images) : Promise<any> {
+        let updated = {}
+
+        for (let key in images) {
+            let imageUrl = images[key]
+            
+            let imagePath = await this.translateImageToIpfs(imageUrl)
+
+            updated[key] = imagePath
+            
+        }
+
+        return updated
+    }
+
+
+    async translateImageToIpfs(imageUrl) : Promise<string> {
+        
+        const imagePath: string = imageUrl.replace('https://s3-us-west-1.amazonaws.com/crypto-baseball/Thumbnails/', '')
+
+        let stat
+        
+        try {
+            stat = await this.ipfs.files.stat('/mlbc/images/' + imagePath)
+        } catch(ex) {}
+
+        if (!stat || !stat.hash) {
+
+            const imageContent = await request.get({
+                uri: imageUrl,
+                encoding: null
+            })
+
+            await this.ipfs.files.write( '/mlbc/images/' + imagePath, new Buffer(imageContent), {
+                create: true, 
+                parents: true, 
+                truncate: true
+            })
+        }
+
+        return imagePath
+    }
+
+
     async saveCardToIpfs(card: Card) : Promise<void> {
 
         let path: string = `/mlbc/${card.tokenID}.json`
@@ -90,7 +150,15 @@ class PlayerService {
 
     async getCardFromIpfs(tokenId: number) : Promise<Card> {
 
-        let card: Card = await this.fileService.loadFile(`/mlbc/${tokenId}.json`)
+        let card: Card
+
+        try {
+            let fileContents: Buffer  = await this.ipfs.files.read(`/mlbc/${tokenId}.json`)
+            card = JSON.parse(fileContents.toString())
+        } catch(ex) {
+            //File not found
+            // console.log(`File not found: ${filename}`)
+        }
 
         return card
     }

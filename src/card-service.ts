@@ -53,7 +53,7 @@ class CardService {
                 card.allAttributes, 
                 card.mlbGameId, card.type, 
                 card.batType, 
-                JSON.stringify(card.imagesURL),
+                JSON.stringify(card.imagesUrl),
                 card.mlbPlayerInfo.status,
                 card.mlbPlayerInfo.position,
                 card.mlbPlayerInfo.lastName,
@@ -73,9 +73,23 @@ class CardService {
 
         const result = await this.query("select * from card where tokenId = ?", [tokenId])
 
+        let record:any
+        
+
         if (result.length > 0) {
-            return result[0]
+            record = result[0]
         }
+
+        if (record.imagesURL) {
+            record.imagesUrl = JSON.parse(record.imagesURL)
+        }
+        
+        if (record.imagesUrl) {
+            record.imagesUrl = JSON.parse(record.imagesUrl)
+        }
+        
+
+        return new Card(record)
 
     }
 

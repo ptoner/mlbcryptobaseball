@@ -3,6 +3,7 @@ import { isMainThread } from 'worker_threads'
 import { FileService } from '../src/file_service';
 import { PlayerService } from '../src/player-service';
 import { CardService } from '../src/card-service';
+import { Card } from '../src/dto/card';
 const util = require('util');
 
 var Web3 = require("web3")
@@ -41,12 +42,16 @@ contract('Process Tests', async (accounts) => {
 
 
     //@ts-ignore
-    it("Test processAll", async () => {
+    it("Test translateImages", async () => {
+
+        //Arrange
+        let card: Card = await cardService.getCard(100)
 
         //Act
-        await playerService.processAll()
+        let translatedCard = await playerService.translateImages(card)
 
-        // console.log(await playerService.getCard(1))
+        //Assert 
+        console.log(translatedCard)
 
     })
 
@@ -71,9 +76,7 @@ function createMySqlConnection() {
     })
 
     mysqlConnection.query('USE mlbcryptobaseball', function(err) {
-        if (err) throw err;
-    
-        console.log('Query Successful');
+        if (err) throw err;    
     })
 
     return mysqlConnection

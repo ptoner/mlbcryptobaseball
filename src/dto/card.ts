@@ -1,4 +1,5 @@
 class Card {
+
     public id: number
     public attributes: string
     public visualString: string 
@@ -29,7 +30,48 @@ class Card {
     public mlbGameId: number 
     public type: string 
     public batType: string 
-    public imagesURL: any 
+
+
+    public imagesUrl: any 
+
+
+    constructor(obj:any) {
+        this.id = obj.id
+        this.attributes = obj.attributes
+        this.visualString  = obj.visualString
+        this.uniformNumber  = obj.uniformNumber
+        this.positionName = obj.positionName
+        this.gameCardTeamID = obj.gameCardTeamID
+        this.teamName = obj.teamName
+        this.positionId = obj.positionId
+        this.attachments = obj.attachments
+        this.playerOverrideId = obj.playerOverrideId
+        this.mlbPlayerInfo = obj.mlbPlayerInfo
+        this.stance = obj.stance
+        this.isPromotional = obj.isPromotional
+        this.isAttached = obj.isAttached
+        this.isPlaying = obj.isPlaying
+        this.tokenID = obj.tokenID
+        this.generationSeason = obj.generationSeason
+        this.creationTimestamp = obj.creationTimestamp
+        this.attachmentString = obj.attachmentString
+        this.abilityString = obj.abilityString
+        this.earnedBy = obj.earnedBy
+        this.gloveType = obj.gloveType
+        this.sequenceId = obj.sequenceId
+        this.earnedByString = obj.earnedByString
+        this.mlbPlayerId = obj.mlbPlayerId
+        this.teamId = obj.teamId
+        this.allAttributes = obj.allAttributes
+        this.mlbGameId = obj.mlbGameId
+        this.type = obj.type
+        this.batType = obj.batType
+        this.imagesUrl = obj.imagesUrl
+    }
+
+
+
+
 
 }
 

@@ -58,9 +58,7 @@ function createMySqlConnection() {
 
     mysqlConnection.query('USE mlbcryptobaseball', function(err) {
         if (err) throw err;
-    
-        console.log('Query Successful');
-    })
+        })
 
     return mysqlConnection
 }
