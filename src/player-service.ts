@@ -134,6 +134,8 @@ class PlayerService {
                 parents: true, 
                 truncate: true
             })
+
+            console.log(`Downloaded image: ${imageUrl}`)
         }
 
         return imagePath
