@@ -127,7 +127,7 @@ class PlayerService {
                 encoding: null
             })
 
-            await this.ipfs.files.write( '/mlbc/images/' + imagePath, new Buffer(imageContent), {
+            await this.ipfs.files.write( '/mlbc/images/' + imagePath, imageContent, {
                 create: true, 
                 parents: true, 
                 truncate: true
