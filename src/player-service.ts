@@ -19,8 +19,6 @@ class PlayerService {
 
     async downloadAll(start: number, finish: number): Promise<void> {
 
-        const self = this
-
         let counter: number = start
     
         while(counter <= finish) {
@@ -28,7 +26,7 @@ class PlayerService {
             try {
                 let tokenId = await this.contractInstance.methods.tokenByIndex(counter).call()
                 
-                await self.downloadToken(tokenId)
+                await this.downloadToken(tokenId)
     
                 counter++
                 
@@ -44,10 +42,12 @@ class PlayerService {
                 
         let card: Card = await this.fetchCardByTokenId(tokenId)
 
-        card = await this.translateImages(card)
-
-
-        return this.saveCardToIpfs(card)
+        if (card) {
+            card = await this.translateImages(card)
+            return this.saveCardToIpfs(card)
+        } else {
+            console.log(`Token #${tokenId} not found. SKipping.`)
+        }
 
     }
 
@@ -84,12 +84,12 @@ class PlayerService {
 
     async translateImages(card: Card) : Promise<Card> {
 
-        if (!card.imagesUrl) return 
-
-        card.imagesUrl.threeSixtyImages = await this.translateImagesToIpfs(card.imagesUrl.threeSixtyImages)
-        card.imagesUrl.featureImages = await this.translateImagesToIpfs(card.imagesUrl.featureImages)
-        card.imagesUrl.bannerImage = await this.translateImageToIpfs(card.imagesUrl.bannerImage)
-        card.imagesUrl.thumbnailImage = await this.translateImageToIpfs(card.imagesUrl.thumbnailImage)
+        if (card.imagesUrl) {
+            card.imagesUrl.threeSixtyImages = await this.translateImagesToIpfs(card.imagesUrl.threeSixtyImages)
+            card.imagesUrl.featureImages = await this.translateImagesToIpfs(card.imagesUrl.featureImages)
+            card.imagesUrl.bannerImage = await this.translateImageToIpfs(card.imagesUrl.bannerImage)
+            card.imagesUrl.thumbnailImage = await this.translateImageToIpfs(card.imagesUrl.thumbnailImage)
+        } 
 
         return card
     }
@@ -165,13 +165,26 @@ class PlayerService {
 
 
     async fetchCardByTokenId(tokenId: number): Promise<Card> {
-        const player = await request.get({
-            uri: ' https://api-dot-cryptobaseball-b691f.appspot.com/playerId/' + tokenId  
-        })
+        
+        let card: Card
 
-        let parsed: Card = JSON.parse(player).result
+        try {
+            const player = await request.get({
+                uri: ' https://api-dot-cryptobaseball-b691f.appspot.com/playerId/' + tokenId  
+            })
+    
+            let parsed = JSON.parse(player)
 
-        return parsed 
+            if (parsed.result && Object.keys(parsed.result).length > 0) {
+                card = new Card(parsed.result)
+            }
+            
+        } catch(ex) {
+            console.log(ex)
+        }
+
+
+        return card 
     }
 
 }

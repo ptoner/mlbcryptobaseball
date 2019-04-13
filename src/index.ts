@@ -32,7 +32,7 @@ const ipfs = ipfsClient({
 
 
 async function run() {
-    await playerService.downloadAll(125000, 165000)
+    await playerService.downloadAll(0, 160000)
 }
 
 

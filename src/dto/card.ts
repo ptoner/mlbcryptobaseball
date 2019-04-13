@@ -66,7 +66,13 @@ class Card {
         this.mlbGameId = obj.mlbGameId
         this.type = obj.type
         this.batType = obj.batType
+
         this.imagesUrl = obj.imagesUrl
+
+        if (obj.imagesURL) {
+            this.imagesUrl = obj.imagesURL
+        }
+
     }
 
 

@@ -50,9 +50,15 @@ contract('Process Tests', async (accounts) => {
         //Act
         let translatedCard = await playerService.translateImages(card)
 
-        //Assert 
-        console.log(translatedCard)
+        // //Assert 
+        // console.log(translatedCard)
 
+    })
+
+    //@ts-ignore
+    it("Test download 0-25000", async () => {
+        //Act
+        await playerService.downloadAll(0, 25000)
     })
 
 })
