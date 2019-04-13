@@ -2,6 +2,11 @@ import { PlayerService} from "./player-service"
 import { FileService } from "./file_service";
 import { CardService } from "./card-service";
 const util = require('util');
+var argv = require('minimist')(process.argv.slice(2));
+
+let start = argv.t //huh?
+let end = argv.d 
+
 
 
 /** Web3 */
@@ -32,7 +37,7 @@ const ipfs = ipfsClient({
 
 
 async function run() {
-    await playerService.downloadAll(0, 160000)
+    await playerService.downloadAll(start, end)
 }
 
 

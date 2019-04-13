@@ -19,6 +19,8 @@ class PlayerService {
 
     async downloadAll(start: number, finish: number): Promise<void> {
 
+        console.log(`Downloading tokens #${start} - #${finish}`)
+
         let counter: number = start
     
         while(counter <= finish) {
