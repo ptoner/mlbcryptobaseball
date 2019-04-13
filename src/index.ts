@@ -14,8 +14,8 @@ var parsedAbi = JSON.parse(fs.readFileSync("contract.json"))
 var mlbContractAddress = '0x8c9b261Faef3b3C2e64ab5E58e04615F8c788099'
 var contractInstance = new web3.eth.Contract(parsedAbi,mlbContractAddress)
 
-var mysqlConnection = createMySqlConnection()
-var mysqlQuery = util.promisify(mysqlConnection.query).bind(mysqlConnection)
+// var mysqlConnection = createMySqlConnection()
+// var mysqlQuery = util.promisify(mysqlConnection.query).bind(mysqlConnection)
 
 const ipfsClient = require('ipfs-http-client')
 
@@ -27,7 +27,7 @@ const ipfs = ipfsClient({
 
 
   let fileService: FileService = new FileService(ipfs)
-  let cardService: CardService = new CardService(mysqlQuery)
+  let cardService: CardService = new CardService(undefined)
   let playerService: PlayerService = new PlayerService(contractInstance,ipfs, fileService, cardService)
 
 
